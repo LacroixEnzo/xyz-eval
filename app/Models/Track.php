@@ -67,4 +67,9 @@ class Track extends Model
             ->orderBy('likes_count', 'desc')
             ->orderBy('created_at', 'asc');
     }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }
