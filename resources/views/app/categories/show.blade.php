@@ -1,9 +1,9 @@
-<x-app :title="$category->name">
+<x-app :title="$category->type">
     <main class="container-wide two-cols space-y-8">
 
         <section>
             <h1>
-                {{ $category->name }} <small>{{ trans_choice('tracks.count', $tracks->total()) }}</small>
+                {{ $category->type }} <small>{{ trans_choice('tracks.count', $tracks->total()) }}</small>
             </h1>
 
             @if ($tracks->isEmpty())
