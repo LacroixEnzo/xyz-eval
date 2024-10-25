@@ -29,7 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/weeks/{week:uri}', [WeekController::class, 'show'])->name('app.weeks.show')->where('week', '[0-9]{4}/[0-9]{2}');
     Route::get('/weeks/{week:uri}/tracks/{track}', [TrackController::class, 'show'])->name('app.tracks.show')->where('week', '[0-9]{4}/[0-9]{2}');
     Route::post('/weeks/{week:uri}/tracks/{track}/like', [TrackController::class, 'like'])->name('app.tracks.like')->where('week', '[0-9]{4}/[0-9]{2}');
-
+    Route::get('/weeks/{week:uri}/tracks', [TrackController::class, 'showWeekTracks'])->name('weeks.tracks.show')->where('week', '[0-9]{4}/[0-9]{2}');
     // Track
     Route::get('/tracks/create', [TrackController::class, 'create'])->name('app.tracks.create');
     Route::post('/tracks/create', [TrackController::class, 'store'])->name('app.tracks.store');

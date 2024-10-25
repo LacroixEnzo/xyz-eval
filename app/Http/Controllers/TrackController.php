@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 class TrackController extends Controller
 {
     /**
-     * Show given track.
+     * Afficher une piste spécifique.
      */
     public function show(Request $request, Week $week, Track $track, Player $player): View
     {
@@ -32,10 +32,11 @@ class TrackController extends Controller
     }
 
     /**
-     * Show create track form.
+     * Afficher le formulaire de création d'une piste.
      */
     public function create(UserService $user): View
     {
+        // Récupérer toutes les catégories
         $categories = Category::all();
 
         return view('app.tracks.create', [
@@ -46,7 +47,7 @@ class TrackController extends Controller
     }
 
     /**
-     * Create a new track.
+     * Enregistrer une nouvelle piste.
      */
     public function store(Request $request, Player $player): RedirectResponse
     {
@@ -56,27 +57,27 @@ class TrackController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'artist' => ['required', 'string', 'max:255'],
             'url' => ['required', 'url', new PlayerUrl()],
+            'category_id' => ['required', 'exists:categories,id'], // Validation de la catégorie
         ]);
 
         DB::beginTransaction();
 
-        // Set track title, artist and url
+        // Créer et associer la nouvelle piste avec ses données
         $track = new Track($validated);
-
-        // Set track's user + week
         $track->user()->associate($request->user());
         $track->week()->associate(Week::current());
+        $track->category()->associate($validated['category_id']); // Associer la catégorie
 
         try {
-            // Fetch track detail from provider (YT, SC)
+            // Récupérer les détails de la piste depuis le fournisseur (YT, SC)
             $details = $player->details($track->url);
 
-            // Set player_id, track_id and thumbnail_url
+            // Associer les détails de la piste
             $track->player = $details->player_id;
             $track->player_track_id = $details->track_id;
             $track->player_thumbnail_url = $details->thumbnail_url;
 
-            // Publish track
+            // Enregistrer la piste
             $track->save();
 
             DB::commit();
@@ -92,7 +93,21 @@ class TrackController extends Controller
     }
 
     /**
-     * Toggle like.
+     * Afficher la liste des pistes par semaine avec leurs catégories.
+     */
+    public function showWeekTracks(Week $week): View
+    {
+        // Charger les pistes avec la relation 'category'
+        $tracks = Track::with('category')->where('week_id', $week->id)->get();
+
+        return view('app.weeks.show', [
+            'week' => $week,
+            'tracks' => $tracks,
+        ]);
+    }
+
+    /**
+     * Basculer le like d'une piste.
      */
     public function like(Request $request, Week $week, Track $track): RedirectResponse
     {

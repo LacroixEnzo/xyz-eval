@@ -68,7 +68,7 @@ class Track extends Model
             ->orderBy('created_at', 'asc');
     }
 
-    public function category()
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
