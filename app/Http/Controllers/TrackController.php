@@ -97,9 +97,7 @@ class TrackController extends Controller
      */
     public function showWeekTracks(Week $week): View
     {
-        // Charger les pistes avec la relation 'category'
         $tracks = Track::with('category')->where('week_id', $week->id)->get();
-
         return view('app.weeks.show', [
             'week' => $week,
             'tracks' => $tracks,
